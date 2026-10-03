@@ -1,0 +1,15 @@
+{
+  "name": "sentinel-mcp-agent-examples",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.5.13",
+    "typescript": "^5.8.0"
+  }
+}

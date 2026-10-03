@@ -1,0 +1,3 @@
+examples/typescript/node_modules/
+examples/python/__pycache__/
+.env
