@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" width="960" height="360" role="img" aria-labelledby="t d">
+  <title id="t">How an agent reaches Sentinel Aleph</title>
+  <desc id="d">Your agent calls the MCP server over HTTPS with JSON-RPC and listens on a separate WebSocket for events. The server reads signals, the ledger and market data and places no orders.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10z" fill="#62b4e5"/>
+    </marker>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10z" fill="#3dd9a0"/>
+    </marker>
+  </defs>
+  <rect width="960" height="360" rx="14" fill="#07111f"/>
+  <g font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif">
+    <!-- agent -->
+    <rect x="32" y="96" width="232" height="168" rx="12" fill="#0a1729" stroke="#2a3b55"/>
+    <text x="148" y="140" text-anchor="middle" fill="#f4f8ff" font-size="20" font-weight="700">Your agent</text>
+    <text x="148" y="170" text-anchor="middle" fill="#8fa3bf" font-size="14">Claude Code, Cursor,</text>
+    <text x="148" y="190" text-anchor="middle" fill="#8fa3bf" font-size="14">your own bot</text>
+    <text x="148" y="234" text-anchor="middle" fill="#c7d3e3" font-size="13" font-family="Consolas, monospace">API key (optional)</text>
+
+    <!-- server -->
+    <rect x="388" y="56" width="268" height="248" rx="12" fill="#0a1729" stroke="#62b4e5"/>
+    <text x="522" y="96" text-anchor="middle" fill="#f4f8ff" font-size="20" font-weight="700">Sentinel Aleph MCP</text>
+    <text x="522" y="120" text-anchor="middle" fill="#8fa3bf" font-size="13" font-family="Consolas, monospace">ribqa.com/api/v1/mcp</text>
+    <rect x="412" y="140" width="220" height="30" rx="6" fill="rgba(61,217,160,0.12)"/>
+    <text x="522" y="160" text-anchor="middle" fill="#3dd9a0" font-size="14">12 read tools</text>
+    <rect x="412" y="178" width="220" height="30" rx="6" fill="rgba(246,188,83,0.12)"/>
+    <text x="522" y="198" text-anchor="middle" fill="#f6bc53" font-size="14">3 strategy writes</text>
+    <rect x="412" y="216" width="220" height="30" rx="6" fill="rgba(98,180,229,0.14)"/>
+    <text x="522" y="236" text-anchor="middle" fill="#62b4e5" font-size="14">1 backtest compute</text>
+    <text x="522" y="282" text-anchor="middle" fill="#c7d3e3" font-size="14" font-weight="600">Places no orders</text>
+
+    <!-- data -->
+    <rect x="752" y="96" width="176" height="168" rx="12" fill="#0a1729" stroke="#2a3b55"/>
+    <text x="840" y="136" text-anchor="middle" fill="#f4f8ff" font-size="18" font-weight="700">Sentinel data</text>
+    <text x="840" y="166" text-anchor="middle" fill="#8fa3bf" font-size="14">Signals · ledger</text>
+    <text x="840" y="188" text-anchor="middle" fill="#8fa3bf" font-size="14">BTC regime · vetoes</text>
+    <text x="840" y="210" text-anchor="middle" fill="#8fa3bf" font-size="14">Candles · news</text>
+    <text x="840" y="232" text-anchor="middle" fill="#8fa3bf" font-size="14">Your strategies</text>
+
+    <!-- arrows -->
+    <line x1="268" y1="150" x2="382" y2="150" stroke="#62b4e5" stroke-width="2" marker-end="url(#a)"/>
+    <text x="325" y="138" text-anchor="middle" fill="#62b4e5" font-size="12" font-family="Consolas, monospace">JSON-RPC</text>
+    <line x1="382" y1="186" x2="268" y2="186" stroke="#62b4e5" stroke-width="2" marker-end="url(#a)"/>
+    <text x="325" y="206" text-anchor="middle" fill="#62b4e5" font-size="12" font-family="Consolas, monospace">results</text>
+    <line x1="382" y1="246" x2="268" y2="246" stroke="#3dd9a0" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#g)"/>
+    <text x="325" y="266" text-anchor="middle" fill="#3dd9a0" font-size="12" font-family="Consolas, monospace">events (WebSocket)</text>
+    <line x1="660" y1="180" x2="746" y2="180" stroke="#2a3b55" stroke-width="2"/>
+    <line x1="746" y1="180" x2="660" y2="180" stroke="#2a3b55" stroke-width="2" marker-end="url(#a)"/>
+  </g>
+</svg>
