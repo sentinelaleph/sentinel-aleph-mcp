@@ -1,3 +1,12 @@
-examples/typescript/node_modules/
-examples/python/__pycache__/
+# Secrets: API keys live in the environment, never in the tree.
 .env
+.env.*
+!.env.example
+*.pem
+
+# Python
+.venv/
+**/__pycache__/
+
+# Node
+node_modules/

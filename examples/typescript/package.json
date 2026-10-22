@@ -3,13 +3,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "start": "tsx basic-signal-listener.ts"
   },
   "dependencies": {
     "ws": "^8.18.0"
   },
   "devDependencies": {
     "@types/ws": "^8.5.13",
+    "tsx": "^4.23.15",
     "typescript": "^5.8.0"
   }
 }

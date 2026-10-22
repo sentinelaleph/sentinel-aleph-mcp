@@ -1,6 +1,6 @@
 # Sentinel Aleph MCP Agent Kit
 
-**Give your AI agent Sentinel Aleph's crypto signals, public ledger, BTC regime read, market data and backtests, through the Model Context Protocol.** The server is read-and-research only: it places no orders, simulated or live.
+**Give your AI agent Sentinel Aleph's crypto signals, public ledger, BTC regime read, market data, the Aleph Edge "Before you trade" read and backtests, through the Model Context Protocol.** The server is read-and-research only: it places no orders, simulated or live.
 
 ![Real tools/list and get_open_signals responses from the live server](assets/session.webp)
 
@@ -14,9 +14,9 @@
 |---|---|
 | Endpoint | `POST https://ribqa.com/api/v1/mcp` (Streamable HTTP, JSON-RPC 2.0, stateless) |
 | Protocol | `2025-11-25`, also `2025-06-18` and `2025-03-26` |
-| Tools | **16**: 12 read, 3 strategy writes, 1 backtest compute |
+| Tools | **17**: 13 read, 3 strategy writes, 1 backtest compute |
 | Key | Not needed for `initialize`, `ping`, `tools/list` and the public read tools |
-| Events | `wss://ribqa.com/api/v1/mcp/ws`: new signals, BTC regime vetoes, BTC chart read changes |
+| Events | `wss://ribqa.com/api/v1/mcp/ws`: new signals, vetoes, entries, stops moved to entry, closes, BTC chart read changes |
 | Trading | None. No tool places, changes or cancels an order |
 | Access | Open beta, every account, no add-on |
 
@@ -61,24 +61,27 @@ API keys are created on [your account page](https://ribqa.com/account) and shown
 
 ## Tools
 
-| Tool | Class | Key | What it returns |
+| Tool | Class | Key scope | What it returns |
 |---|---|---|---|
-| `get_open_signals` | read | public | Open published signals, newest first: entry, stop loss, take-profit levels, planned reward:risk, market |
-| `get_signal_ledger` | read | public | Ledger headline over the matured cohort with its n (win rate null below 20), per-engine rows, net P&L points, recent settled outcomes |
-| `get_vetoed_signals` | read | public | Signals the BTC regime veto cancelled in the last 7 days, with the reason and how the position closed |
-| `get_market_snapshot` | read | public | Recent 4h candles and a summary for one scanned symbol |
-| `get_ticker` | read | public | Last price and OHLC, volume, change % over a window |
-| `get_btc_chart_read` | read | public | Latest BTC chart read: rule and model direction, levels, graded hits with n |
-| `get_news` | read | public | Recent headlines from a fixed list of public feeds and the latest digest |
-| `get_my_bots` | read | key | Your bots with status and counters |
-| `get_my_strategies` | read | key | Your saved strategies, newest first |
-| `get_strategy` | read | key | One saved strategy with every field |
-| `get_my_backtests` | read | key | Your backtest runs, newest first |
-| `get_backtest` | read | key | One stored backtest run with its trades |
-| `create_strategy` | write | key | Saves a new strategy and returns it with its id |
-| `update_strategy` | write | key | Changes fields of one of your strategies |
-| `delete_strategy` | write | key | Archives one of your strategies |
-| `run_backtest` | compute | key | Replays one of your strategies on historical candles and returns the summary |
+| `get_open_signals` | read | none | Open published signals, newest first: entry, stop loss, take-profit levels, planned reward:risk, market |
+| `get_signal_ledger` | read | none | Ledger headline over the matured cohort with its n (win rate null below 20), per-engine rows, net P&L points, recent settled outcomes |
+| `get_vetoed_signals` | read | none | Signals the BTC regime veto cancelled in the last 7 days, with the reason and how the position closed |
+| `get_market_snapshot` | read | none | Recent 4h candles and a summary for one scanned symbol |
+| `get_ticker` | read | none | Last price and OHLC, volume, change % over a window |
+| `get_btc_chart_read` | read | none | Latest BTC chart read: rule and model direction, levels, graded hits with n |
+| `get_news` | read | none | Recent headlines from a fixed list of public feeds and the latest digest |
+| `get_before_you_trade` | read | none | The Aleph Edge "Before you trade" payload: BTC regime, chart read, volatility, funding, template evidence in fixed order, news impact, listings. Research data, not advice |
+| `get_my_bots` | read | read | Your bots with status and counters |
+| `get_my_strategies` | read | read | Your saved strategies, newest first |
+| `get_strategy` | read | read | One saved strategy with every field |
+| `get_my_backtests` | read | read | Your backtest runs, newest first |
+| `get_backtest` | read | read | One stored backtest run with its trades |
+| `create_strategy` | write | write | Saves a new strategy and returns it with its id |
+| `update_strategy` | write | write | Changes fields of one of your strategies |
+| `delete_strategy` | write | write | Archives one of your strategies |
+| `run_backtest` | compute | write | Replays one of your strategies on historical candles and returns the summary |
+
+Key scope `none` means the tool answers without a key. `read` tools take any key. `write` tools need a key created with the read + write scope on the account page.
 
 Arguments, ranges, usage units, rate limits and error codes for every tool: **[ribqa.com/mcp](https://ribqa.com/mcp)**. More detail on each tool: [docs/mcp-tools.md](docs/mcp-tools.md).
 
@@ -86,21 +89,38 @@ Arguments, ranges, usage units, rate limits and error codes for every tool: **[r
 
 ## Events channel (push)
 
-MCP over HTTP has no push. New signals, BTC regime vetoes and BTC chart read changes arrive on a separate WebSocket, `wss://ribqa.com/api/v1/mcp/ws`, with the same `Authorization: Bearer` header.
+MCP over HTTP has no push, so events arrive on a separate WebSocket, `wss://ribqa.com/api/v1/mcp/ws`. Log in with the same `Authorization: Bearer` header. A browser cannot set headers on a WebSocket, so it offers two subprotocols instead, the fixed name and the key:
 
-Send:
-
-```json
-{"id":"1","type":"subscribe","symbol":"*"}
+```js
+const ws = new WebSocket("wss://ribqa.com/api/v1/mcp/ws", ["sentinel.mcp", apiKey]);
 ```
 
-(or a pair such as `BTCUSDT`). Events arrive as:
+The server echoes only `sentinel.mcp`, never the key. A page served from another site's Origin gets 403, and a key in the URL is refused.
+
+Client messages:
+
+| Send | Answer |
+|---|---|
+| `{"id":"1","type":"subscribe","symbol":"*"}` (or a pair such as `BTCUSDT`) | `{"id":"1","result":{"subscribed":true,"symbol":"*"}}` |
+| `{"id":"2","type":"unsubscribe","symbol":"*"}` | `{"id":"2","result":{"subscribed":false,"symbol":"*"}}` |
+| `{"id":"3","type":"ping"}` | `{"id":"3","result":{"type":"pong"}}` |
+
+Errors come back as `{"id":"..","error":{"code":400,"message":".."}}`. Events arrive as:
 
 ```json
 {"id":"event","result":{"type":"signal","symbol":"BTCUSDT","data":{}}}
 ```
 
-with `type` one of `signal`, `signal.veto` or `market.btc_chart_read`.
+| `type` | When |
+|---|---|
+| `signal` | A new signal is published |
+| `signal.veto` | The BTC regime veto cancels a signal |
+| `signal.entry` | An open signal's entry fills |
+| `signal.stop_to_entry` | An open position reaches its breakeven trigger and the stop moves to entry |
+| `signal.closed` | An open signal's outcome is booked |
+| `market.btc_chart_read` | The BTC chart read changes direction (sent to `BTCUSDT` and `*` subscribers) |
+
+A session holds up to 50 subscriptions, a key up to 3 sessions, and each message is capped at 64 KB.
 
 ## Examples
 
@@ -109,7 +129,7 @@ with `type` one of `signal`, `signal.veto` or `market.btc_chart_read`.
 | [`examples/python/basic-signal-listener.py`](examples/python/basic-signal-listener.py) | Subscribe to the events channel and print signals and vetoes |
 | [`examples/typescript/basic-signal-listener.ts`](examples/typescript/basic-signal-listener.ts) | The same listener in TypeScript |
 
-Both read `SENTINEL_MCP_KEY` (and optionally `SENTINEL_MCP_WS_URL`) from the environment; `.env.example` lists them. They refuse a plain `ws://` URL outside `localhost` (the key is a header), reconnect with backoff, skip frames that are not JSON, and stop on a 401 / 403.
+Both read `SENTINEL_MCP_KEY` (and optionally `SENTINEL_MCP_WS_URL`) from the environment; `.env.example` lists them. They refuse a plain `ws://` URL outside `localhost`, because the key travels in a header, and they skip frames that are not JSON. A 401 or 403 stops them, since a wrong or revoked key will not fix itself. Other failures (429, 5xx, a Cloudflare 52x, a dropped connection) are retried with exponential backoff up to 60 s, never sooner than a `Retry-After` header asks, and the backoff resets after a successful open.
 
 ```bash
 export SENTINEL_MCP_KEY=<your API key>
@@ -120,7 +140,7 @@ cd examples/python && pip install -r requirements.txt && python basic-signal-lis
 ```
 
 ```bash
-cd examples/typescript && npm install && npx tsx basic-signal-listener.ts
+cd examples/typescript && npm install && npm start
 ```
 
 ## Guides for agent builders
@@ -142,7 +162,7 @@ cd examples/typescript && npm install && npx tsx basic-signal-listener.ts
 
 ## Related
 
-- [Aleph Edge](https://github.com/sentinelaleph/AlephEdge): the desktop trading desk that follows the same signals, with paper DCA and Grid bots and a local key vault.
+- [Aleph Edge](https://github.com/sentinelaleph/AlephEdge): a desktop app for bots that follow the same signals. Each bot runs in Paper or Live mode. TradingView alerts can trade live on Binance USDT-M futures. The order path covers 9 venues, and only Binance has been verified live.
 - [Sentinel Aleph](https://ribqa.com): the signal ledger and the scanner behind these tools.
 
 ## License
