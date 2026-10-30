@@ -16,7 +16,7 @@
 | Protocol | `2025-11-25`, also `2025-06-18` and `2025-03-26` |
 | Tools | **17**: 13 read, 3 strategy writes, 1 backtest compute |
 | Key | Not needed for `initialize`, `ping`, `tools/list` and the public read tools |
-| Events | `wss://ribqa.com/api/v1/mcp/ws`: new signals, vetoes, entries, stops moved to entry, closes, BTC chart read changes |
+| Events | `wss://ribqa.com/api/v1/mcp/ws`: new signals, vetoes, entries, stops moved to entry, closes, new BTC chart reads |
 | Trading | None. No tool places, changes or cancels an order |
 | Access | Open beta, every account, no add-on |
 
@@ -68,7 +68,7 @@ API keys are created on [your account page](https://ribqa.com/account) and shown
 | `get_vetoed_signals` | read | none | Signals the BTC regime veto cancelled in the last 7 days, with the reason and how the position closed |
 | `get_market_snapshot` | read | none | Recent 4h candles and a summary for one scanned symbol |
 | `get_ticker` | read | none | Last price and OHLC, volume, change % over a window |
-| `get_btc_chart_read` | read | none | Latest BTC chart read: rule and model direction, levels, graded hits with n |
+| `get_btc_chart_read` | read | none | Latest BTC chart read: structure and levels; direction calls withdrawn 31 Oct 2026, graded record with n |
 | `get_news` | read | none | Recent headlines from a fixed list of public feeds and the latest digest |
 | `get_before_you_trade` | read | none | The Aleph Edge "Before you trade" payload: BTC regime, chart read, volatility, funding, template evidence in fixed order, news impact, listings. Research data, not advice |
 | `get_my_bots` | read | read | Your bots with status and counters |
@@ -118,7 +118,7 @@ Errors come back as `{"id":"..","error":{"code":400,"message":".."}}`. Events ar
 | `signal.entry` | An open signal's entry fills |
 | `signal.stop_to_entry` | An open position reaches its breakeven trigger and the stop moves to entry |
 | `signal.closed` | An open signal's outcome is booked |
-| `market.btc_chart_read` | The BTC chart read changes direction (sent to `BTCUSDT` and `*` subscribers) |
+| `market.btc_chart_read` | A new BTC chart read was stored: id, read_at, price, no direction (sent to `BTCUSDT` and `*` subscribers) |
 
 A session holds up to 50 subscriptions, a key up to 3 sessions, and each message is capped at 64 KB.
 
